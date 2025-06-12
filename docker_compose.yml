@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  psql-db:
+    image: postgres:15-alpine
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: warehouse_user
+      POSTGRES_PASSWORD: warehouse_pass
+      POSTGRES_DB: warehouse_db
+    volumes:
+      - C:\Users\eridu\Desktop\data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres-db-network
+
+volumes:
+  postgres-db-volume:
+
+networks:
+  postgres-db-network:
+    driver: bridge
