@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  demo-db-1:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: warehouse_user
+      POSTGRES_PASSWORD: warehouse_pass
+      POSTGRES_DB: warehouse_db
+    networks:
+      - warehouse-net
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+    ports:
+      - "5432:5432"
+
+  demo-api-1:
+    build: .
+    restart: always
+
+    depends_on:
+      - demo-db-1
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://demo-db-1:5432/warehouse_db
+      SPRING_DATASOURCE_USERNAME: warehouse_user
+      SPRING_DATASOURCE_PASSWORD: warehouse_pass
+
+    ports:
+      - "8080:8080"
+    networks:
+      - warehouse-net
+
+volumes:
+  db-data:
+
+networks:
+  warehouse-net:
+    driver: bridge

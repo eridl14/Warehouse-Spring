@@ -3,7 +3,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -12,9 +11,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "invetory" , uniqueConstraints = @UniqueConstraint(columnNames = {"warehouse_id","product_id"}))
+@Table(name = "inventory" , uniqueConstraints = @UniqueConstraint(columnNames = {"warehouse_id","product_id"}))
 
-public class Invetory extends BaseEntity {
+public class Inventory extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "warehouse_id",nullable = false)
