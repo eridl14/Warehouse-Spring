@@ -1,14 +1,18 @@
 package com.example.warehouse.controller;
 
 
-import com.example.warehouse.entity.Warehouse;
+import com.example.warehouse.dto.request.CreateWarehouseDTO;
+import com.example.warehouse.dto.response.WarehouseResponseDTO;
 import com.example.warehouse.service.WarehouseService;
+import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/warehouse")
@@ -20,16 +24,17 @@ public class WarehouseController {
         this.warehouseService = warehouseService;
     }
 
+
     //Get/api/warehouse
     @GetMapping
-    public ResponseEntity<List<Warehouse>> getAllWarehouse() {
-        List<Warehouse> warehouses = warehouseService.getAllWarehouses();
+    public ResponseEntity<Page<WarehouseResponseDTO>> getWarehouses(@ParameterObject Pageable pageable) {
+        Page<WarehouseResponseDTO> warehouses = warehouseService.getAllWarehouses(pageable);
         return ResponseEntity.ok(warehouses);
     }
 
     //Get/api/warehouse/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<Warehouse> getWarehouseById(@PathVariable Integer id) {
+    public ResponseEntity<WarehouseResponseDTO> getWarehouseById(@PathVariable Integer id) {
         return warehouseService.getWarehouseById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -37,21 +42,13 @@ public class WarehouseController {
 
     //Post/api/warehouse/crate
     @PostMapping
-    public ResponseEntity<Warehouse> createWarehouse(@RequestBody Warehouse warehouse) {
-        Warehouse created = warehouseService.createWarehouse(warehouse);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<WarehouseResponseDTO> createWarehouse(
+            @Valid @RequestBody CreateWarehouseDTO createWarehouseDTO){
+        WarehouseResponseDTO responseDTO = warehouseService.createWarehouse(createWarehouseDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
-    //Post/api/warehouse/update
-    @PutMapping("/{id}")
-    public ResponseEntity<Warehouse> updateWarehouse(@PathVariable Integer id, @RequestBody Warehouse warehouse) {
-        try {
-            Warehouse updated = warehouseService.updateWarehouse(id, warehouse);
-            return ResponseEntity.ok(updated);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
+
 
     //Post/api/warehouse/delete
     @DeleteMapping("/{id}")
@@ -66,23 +63,22 @@ public class WarehouseController {
 
     //Get /api/warehouse/By Name
     @GetMapping("/searchByName")
-    public ResponseEntity<List<Warehouse>> searchByName(@RequestParam String name) {
-        List<Warehouse> warehouses = warehouseService.findWarehouseByNameContainingIgnoreCase(name);
+    public ResponseEntity<Page<WarehouseResponseDTO>> searchByName(@ParameterObject Pageable pageable,@RequestParam String name) {
+        Page<WarehouseResponseDTO> warehouses = warehouseService.findWarehouseByNameContainingIgnoreCase(pageable, name);
         return ResponseEntity.ok(warehouses);
 
     }
 
     //Get / api/warehouse/By capacity
     @GetMapping("/searchByCapacity")
-    public ResponseEntity<List<Warehouse>> searchByCapacity(@RequestParam BigDecimal capacity) {
-        List<Warehouse> warehouses = warehouseService.findWarehouseByCapacityGreaterThan(capacity);
+    public ResponseEntity<Page<WarehouseResponseDTO>> searchByCapacity(@ParameterObject Pageable pageable, @RequestParam BigDecimal capacity) {
+        Page<WarehouseResponseDTO> warehouses = warehouseService.findWarehouseByCapacityGreaterThan(pageable ,capacity);
         return ResponseEntity.ok(warehouses);
     }
 
     @GetMapping("/ManagerName")
-    public ResponseEntity<List<Warehouse>> getByManagerName() {
-        List<Warehouse> warehouses = warehouseService.findWarehouseByManagerName();
+    public ResponseEntity<Page<WarehouseResponseDTO>> getByManagerName(@ParameterObject Pageable pageable) {
+        Page<WarehouseResponseDTO> warehouses = warehouseService.findWarehouseByManagerName( pageable);
         return ResponseEntity.ok(warehouses);
     }
-
 }

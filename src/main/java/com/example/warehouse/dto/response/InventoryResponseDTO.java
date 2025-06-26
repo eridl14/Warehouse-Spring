@@ -1,9 +1,14 @@
 package com.example.warehouse.dto.response;
 
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
-public record InventoryResponseDTO(
-        String name,
-        Integer quantity,
-        LocalDateTime lastRestocked) {
+import java.time.LocalDateTime;
+@Getter
+@Setter
+
+public class InventoryResponseDTO{
+        String name;
+        Integer quantity;
+        LocalDateTime lastRestocked;
 }

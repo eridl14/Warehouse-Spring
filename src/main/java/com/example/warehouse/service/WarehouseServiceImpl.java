@@ -1,68 +1,66 @@
 package com.example.warehouse.service;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
 
+import com.example.warehouse.dto.request.CreateWarehouseDTO;
+import com.example.warehouse.dto.response.WarehouseResponseDTO;
 import com.example.warehouse.entity.Warehouse;
+import com.example.warehouse.entity.WarehouseStatus;
 import com.example.warehouse.repository.WarehouseRepository;
-import jakarta.persistence.Id;
-import lombok.Getter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 @Service
-public class WarehouseServiceImpl implements WarehouseService{
+public class WarehouseServiceImpl implements WarehouseService {
 
-    private final WarehouseRepository warehouseRepository;
+    private final WarehouseRepository repository;
+    private final ModelMapper modelMapper;
 
-    public WarehouseServiceImpl(WarehouseRepository warehouseRepository) {
-        this.warehouseRepository = warehouseRepository;
-    }
-
-    @Override
-    public List<Warehouse> getAllWarehouses(){
-        return warehouseRepository.findAll();
-    }
-    @Override
-    public Optional<Warehouse> getWarehouseById(Integer id){
-        return warehouseRepository.findById(id);
-    }
-    @Override
-    public Warehouse createWarehouse(Warehouse warehouse) {
-        return warehouseRepository.save(warehouse);
-    }
-    @Override
-    public Warehouse updateWarehouse(Integer id, Warehouse warehouse) {
-        return warehouseRepository.findById(id)
-        .map(existing -> {
-            existing.setName(warehouse.getName());
-            existing.setAddress(warehouse.getAddress());
-            existing.setCapacity(warehouse.getCapacity());
-            existing.setManagerName(warehouse.getManagerName());
-            return warehouseRepository.save(existing);
-        })
-                .orElseThrow(() -> new RuntimeException("Warehouse not found: " + id));
+    public WarehouseServiceImpl(WarehouseRepository repository, ModelMapper modelMapper) {
+        this.repository = repository;
+        this.modelMapper = modelMapper;
     }
 
-    @Override
-    public void deleteWarehouse(Integer id) {
-        warehouseRepository.deleteById(id);
+    public WarehouseResponseDTO createWarehouse(CreateWarehouseDTO createWarehouseDTO) {
+        Warehouse warehouse = modelMapper.map(createWarehouseDTO, Warehouse.class);
+
+        warehouse.setStatus(WarehouseStatus.ACTIVE);
+        warehouse.setCreateDay(LocalDateTime.now());
+        Warehouse savedWarehouse = repository.save(warehouse);
+        return modelMapper.map(savedWarehouse, WarehouseResponseDTO.class);
     }
 
-    @Override
-    public List<Warehouse> findWarehouseByNameContainingIgnoreCase(String name) {
-        return warehouseRepository.findByNameContainingIgnoreCase(name);
+    public Page<WarehouseResponseDTO> getAllWarehouses(Pageable pageable) {
+        Page<Warehouse> warehouses = repository.findAll(pageable);
+        return warehouses.map(warehouse -> modelMapper.map(warehouse, WarehouseResponseDTO.class));
     }
 
-    @Override
-    public List<Warehouse> findWarehouseByCapacityGreaterThan(BigDecimal capacity) {
-        return warehouseRepository.findByCapacityGreaterThan(capacity);
+    public Optional<WarehouseResponseDTO> getWarehouseById(Integer id) {
+        Optional<Warehouse> warehouseOpt = repository.findById(id);
+        return warehouseOpt.map(warehouse -> modelMapper.map(warehouse, WarehouseResponseDTO.class));
     }
 
-    @Override
-    public List<Warehouse> findWarehouseByManagerName() {
-        return warehouseRepository.findByManagerName();
+    public void deleteWarehouse(Integer id){
+        repository.deleteById(id);
+    }
+    public Page<WarehouseResponseDTO> findWarehouseByNameContainingIgnoreCase(Pageable pageable, String name) {
+        Page<Warehouse> warehouses = repository.findByNameContainingIgnoreCase(pageable , name );
+        return warehouses.map(warehouse -> modelMapper.map(warehouse, WarehouseResponseDTO.class));
+    }
+    public Page<WarehouseResponseDTO> findWarehouseByCapacityGreaterThan(Pageable pageable,BigDecimal capacity){
+        Page<Warehouse> warehouses = repository.findByCapacityGreaterThan(pageable, capacity);
+        return warehouses.map(warehouse -> modelMapper.map(warehouse,WarehouseResponseDTO.class));
     }
 
+
+    public Page<WarehouseResponseDTO>  findWarehouseByManagerName(Pageable pageable){
+        Page<Warehouse> warehouses = repository.findWarehouseByManagerName(pageable);
+        return warehouses.map(warehouse -> modelMapper.map(warehouse,WarehouseResponseDTO.class));
+    }
 
 }
