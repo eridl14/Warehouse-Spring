@@ -52,7 +52,8 @@ class WarehouseControllerTest {
                 0,
                 null,
                 "Springfield, USA",
-                "Springfield"
+                "Springfield",
+                "Null"
         );
 
         when(warehouseService.createWarehouse(any(CreateWarehouseDTO.class)))

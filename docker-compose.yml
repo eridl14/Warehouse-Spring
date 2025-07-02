@@ -30,6 +30,7 @@ services:
       - "8080:8080"
     networks:
       - warehouse-net
+    command: ["java", "--enable-preview", "-jar", "/app/app.jar"]
 
 volumes:
   db-data:

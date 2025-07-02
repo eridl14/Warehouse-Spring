@@ -19,11 +19,12 @@ public abstract class BaseEntity {
     @Column(length = 50)
     private String name;
     @Column(nullable = false , name = "create_day")
-    private LocalDateTime createDay;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     @PrePersist
     public void prePersist() {
-        createDay = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
     }
 
 }

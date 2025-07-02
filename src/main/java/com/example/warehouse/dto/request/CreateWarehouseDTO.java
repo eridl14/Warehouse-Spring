@@ -1,4 +1,5 @@
 package com.example.warehouse.dto.request;
+import com.example.warehouse.entity.Warehouse;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -17,8 +18,19 @@ public class CreateWarehouseDTO {
         @Size(max = 50, message = "Name cannot exceed 50 characters")
         String name;
         @NotBlank(message = "Location is required")
-        String location;
+        String address;
         BigDecimal capacity;
         String city;
+
+        public static Warehouse toEntity(CreateWarehouseDTO dto) {
+                if (dto == null) return null;
+                Warehouse entity = new Warehouse();
+                entity.setName(dto.getName());
+                entity.setAddress(dto.getAddress());
+                entity.setCity(dto.getCity());
+
+                entity.setCapacity(dto.getCapacity());
+                return entity;
+        }
 }
 
